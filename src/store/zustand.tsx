@@ -1,6 +1,16 @@
 import { create } from 'zustand'
 
-export const useZustand = create((set) => ({
+export type UserZ = { id: number; name: string; age: number }
+export type AddUser = UserZ & { status: boolean; job: string }
+
+type Store = {
+  dataZ: UserZ[]
+  deleteUserZ: (id: number) => void
+  addUserZ: (user: AddUser) => void
+  editUserZ: (user: AddUser) => void
+}
+
+export const useZustand = create<Store>((set) => ({
     dataZ: [
         {
             id: 1,

@@ -1,6 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
-const initialState = {
+export type UserR = { id: number; status: boolean; job: string; photo: string }
+
+const initialState: { dataR: UserR[] } = {
     dataR : [
         {
            id : 1,
@@ -39,14 +41,14 @@ export const TodoSlice = createSlice({
   name: 'data',
   initialState,
   reducers: {
-    deleteUserR : (state , action)=>{
-      state.dataR = state.dataR.filter((el)=>el.id !=action.payload)
+    deleteUserR : (state, action: PayloadAction<number>) => {
+      state.dataR = state.dataR.filter((el) => el.id != action.payload)
     },
-    AddUserR : (state , action)=>{
-      state.dataR = [action.payload,...state.dataR]
+    AddUserR : (state, action: PayloadAction<UserR>) => {
+      state.dataR = [action.payload, ...state.dataR]
     },
-    EditUserR : (state , action)=>{
-      state.dataR = state.dataR.map((el)=> el.id === action.payload.id ? action.payload : el)
+    EditUserR : (state, action: PayloadAction<UserR>) => {
+      state.dataR = state.dataR.map((el) => el.id === action.payload.id ? action.payload : el)
     }
   },
 })

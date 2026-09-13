@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
 import { useDispatch } from "react-redux"
-import { useZustand } from "@/store/zustand"
-import { AddUserR } from "@/store/TodoSlice"
+import { useZustand, type AddUser } from "@/store/zustand"
+import { AddUserR, type UserR } from "@/store/TodoSlice"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
 import { Field, FieldGroup } from "@/components/ui/field"
@@ -9,32 +9,39 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 
-export default function AddDialog({ open, setOpen }) {
+interface AddDialogProps {
+  open: boolean
+  setOpen: (open: boolean) => void
+}
+
+export default function AddDialog({ open, setOpen }: AddDialogProps) {
   const { dataZ, addUserZ } = useZustand()
   const dispatch = useDispatch()
   const [name, setName] = useState("")
   const [age, setAge] = useState("")
-  const [status, setStatus] = useState("active")
+  const [status, setStatus] = useState<"active" | "inactive">("active")
   const [job, setJob] = useState("")
   const [photo, setPhoto] = useState("")
 
-  function handleSubmit(event) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const nextId = dataZ.reduce((max, el) => Math.max(max, el.id), 0) + 1
     const photoUrl = photo || `https://i.pravatar.cc/150?img=${(nextId % 70) + 1}`
-    addUserZ({
+    const user: AddUser = {
       id: nextId,
       name,
       age: Number(age),
       status: status === "active",
       job,
-    })
-    dispatch(AddUserR({
+    }
+    addUserZ(user)
+    const userR: UserR = {
       id: nextId,
       status: status === "active",
       job,
       photo: photoUrl,
-    }))
+    }
+    dispatch(AddUserR(userR))
     setName("")
     setAge("")
     setStatus("active")

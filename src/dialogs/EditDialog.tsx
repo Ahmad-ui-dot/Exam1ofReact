@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useState, type FormEvent } from "react"
 import { useDispatch } from "react-redux"
-import { useZustand } from "@/store/zustand"
-import { EditUserR } from "@/store/TodoSlice"
+import { useZustand, type AddUser } from "@/store/zustand"
+import { EditUserR, type UserR } from "@/store/TodoSlice"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -24,31 +24,46 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export default function EditDialog({ open, setOpen, user }) {
+interface EditDialogProps {
+  open: boolean
+  setOpen: (open: boolean) => void
+  user: {
+    id: number
+    name: string
+    age: number
+    status?: boolean
+    job?: string
+    photo?: string
+  } | null
+}
+
+export default function EditDialog({ open, setOpen, user }: EditDialogProps) {
   const { editUserZ } = useZustand()
   const dispatch = useDispatch()
   const [name, setName] = useState(user?.name ?? "")
   const [age, setAge] = useState(user ? String(user.age) : "")
-  const [status, setStatus] = useState(user?.status ? "active" : "inactive")
+  const [status, setStatus] = useState<"active" | "inactive">(user?.status ? "active" : "inactive")
   const [job, setJob] = useState(user?.job ?? "")
   const [photo, setPhoto] = useState(user?.photo ?? "")
 
-  function handleSubmit(event) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!user) return
-    editUserZ({
+    const userZ: AddUser = {
       id: user.id,
       name,
       age: Number(age),
       status: status === "active",
       job,
-    })
-    dispatch(EditUserR({
+    }
+    editUserZ(userZ)
+    const userR: UserR = {
       id: user.id,
       status: status === "active",
       job,
-      photo: photo || user.photo,
-    }))
+      photo: photo || user.photo || "",
+    }
+    dispatch(EditUserR(userR))
     setOpen(false)
   }
 

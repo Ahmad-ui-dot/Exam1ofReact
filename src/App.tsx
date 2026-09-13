@@ -1,22 +1,24 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router"
-import { useZustand } from "./store/zustand"
-import { deleteUserR } from "./store/TodoSlice"
+import { useZustand, type UserZ } from "./store/zustand"
+import { deleteUserR, type UserR } from "./store/TodoSlice"
 import { Button } from "./components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import AddDialog from "./dialogs/AddDialog"
 import EditDialog from "./dialogs/EditDialog"
 
+type User = UserZ & Partial<UserR>
+
 export default function App() {
   const { dataZ, deleteUserZ } = useZustand()
-  const { dataR } = useSelector((state) => state.data)
+  const { dataR } = useSelector((state: { data: { dataR: UserR[] } }) => state.data)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
-  const [editUser, setEditUser] = useState(null)
+  const [editUser, setEditUser] = useState<User | null>(null)
 
-  const data = dataZ.map((el) => {
+  const data: User[] = dataZ.map((el) => {
     const elR = dataR.find((e) => e.id === el.id)
     return {
       ...el,
